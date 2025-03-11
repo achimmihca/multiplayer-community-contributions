@@ -14,6 +14,8 @@ namespace Netcode.Transports.Facepunch
 
     public class FacepunchTransport : NetworkTransport, IConnectionManager, ISocketManager
     {
+        public bool shutdownOnDestroy = true;
+
         private ConnectionManager connectionManager;
         private SocketManager socketManager;
         private Dictionary<ulong, Client> connectedClients;
@@ -42,6 +44,11 @@ namespace Netcode.Transports.Facepunch
 
         private void Awake()
         {
+            if (SteamClient.IsValid)
+            {
+                return;
+            }
+
             try
             {
                 SteamClient.Init(steamAppId, false);
@@ -64,7 +71,10 @@ namespace Netcode.Transports.Facepunch
 
         private void OnDestroy()
         {
-            SteamClient.Shutdown();
+            if (shutdownOnDestroy)
+            {
+                SteamClient.Shutdown();
+            }
         }
 
         #endregion
